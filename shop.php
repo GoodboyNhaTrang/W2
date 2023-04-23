@@ -9,19 +9,17 @@ if (!isset($user_id)) {
 }
 
 if (isset($_POST['add_to_cart'])) {
-  $product_name = $_POST['product_name'];
-  $product_price = $_POST['product_price'];
-  $product_image = $_POST['product_image'];
+  $product_id = $_POST['product_id'];
   $product_quantity = $_POST['product_quantity'];
 
   $check_cart_numbers = mysqli_query($conn, "SELECT * FROM `cart` 
-  WHERE name = '$product_name' AND user_id = '$user_id'") or die('query failed');
+  WHERE product_id = '$product_id' AND user_id = '$user_id'") or die('query failed');
 
   if (mysqli_num_rows($check_cart_numbers) > 0) {
     $message[] = 'already added to cart';
   } else {
-    mysqli_query($conn, "INSERT INTO `cart`(user_id, name, price, quantity, image) 
-    VALUES('$user_id', '$product_name', '$product_price', '$product_quantity', '$product_image')")
+    mysqli_query($conn, "INSERT INTO `cart`(user_id, product_id, quantity) 
+    VALUES('$user_id', '$product_id','$product_quantity', )")
       or die('query failed');
     $message[] = 'product added to cart!';
   }
@@ -125,13 +123,12 @@ $this_page_first_result = ($page - 1) * $results_per_page;
 
       ?>
       <form action="" method="post" class="box">
-        <img class="image" src="uploaded_img/<?php echo $fetch_products['image']; ?>" alt="">
+        <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
+        <a href="product_detail.php?idSp=<?= $fetch_products['id'] ?>"><img class="image"
+            src="uploaded_img/<?php echo $fetch_products['image']; ?>" alt=""></a>
         <div class="name"><?php echo $fetch_products['name']; ?></div>
         <div class="price">$<?php echo $fetch_products['price']; ?>/-</div>
         <input type="number" min="1" name="product_quantity" value="1" class="qty">
-        <input type="hidden" name="product_name" value="<?php echo $fetch_products['name']; ?>">
-        <input type="hidden" name="product_price" value="<?php echo $fetch_products['price']; ?>">
-        <input type="hidden" name="product_image" value="<?php echo $fetch_products['image']; ?>">
         <input type="submit" value="add to cart" name="add_to_cart" class="btn">
       </form>
       <?php
@@ -143,8 +140,14 @@ $this_page_first_result = ($page - 1) * $results_per_page;
     </div>
 
     <div class="pagination">
-      <a name="prev-btn" href="shop.php?page=1">&laquo;</a>
       <?php
+      if (!isset($_GET['category'])) {
+        echo '<a name="prev-btn" href="shop.php?page=1">&laquo;</a>';
+      } else {
+        $category = $_GET['category'];
+        echo '<a name="prev-btn" href="shop.php?category=' . $category . '&page=1">&laquo;</a>';
+      }
+
 
       for ($page = 1; $page <= $number_of_pages; $page++) {
         $active = ($page == 1) ? 'active' : '';
@@ -159,11 +162,18 @@ $this_page_first_result = ($page - 1) * $results_per_page;
           echo '<a class="' . $active . '"id="num_page" href="shop.php?page=' . $page . '">' . $page . '</a> ';
         } else {
           $category = $_GET['category'];
-          echo '<a class="' . $active . '"id="num_page" href="shop.php?category=' . $category . '?page=' . $page . '">' . $page . '</a> ';
+          echo '<a class="' . $active . '"id="num_page" href="shop.php?category=' . $category . '&page=' . $page . '">' . $page . '</a> ';
         }
       }
+
+      if (!isset($_GET['category'])) {
+        echo '<a class="next-btn" href="shop.php?page=' . $number_of_pages . '">&raquo;</a>';
+      } else {
+        $category = $_GET['category'];
+        echo '<a class="next-btn" href="shop.php?category=' . $category . '&page=' . $number_of_pages . '">&raquo;</a>';
+      }
       ?>
-      <a class="next-btn" href="shop.php?page=<?php echo $number_of_pages ?>">&raquo;</a>
+
     </div>
 
 

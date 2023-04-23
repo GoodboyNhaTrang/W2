@@ -13,9 +13,9 @@ if (isset($_POST['order_btn'])) {
   $number = $_POST['number'];
   $email = mysqli_real_escape_string($conn, $_POST['email']);
   $method = mysqli_real_escape_string($conn, $_POST['method']);
-  $address = mysqli_real_escape_string($conn, 'flat no. ' . $_POST['flat'] . ','
-    . $_POST['street'] . ', ' . $_POST['city'] . ', ' . $_POST['country'] . ' - ' .
-    $_POST['pin_code']);
+  $address = mysqli_real_escape_string($conn, $_POST['flat'] . ','
+    . $_POST['street'] .  ', ' . $_POST['village'] .', ' . $_POST['district'] . ', ' . $_POST['city'] . ' - ' .
+    $_POST['province']);
   $placed_on = date('Y-m-d');
 
   $cart_total = 0;
@@ -90,8 +90,8 @@ if (isset($_POST['order_btn'])) {
         $grand_total += $total_price;
     ?>
 
-        <p> <?php echo $fetch_cart['name']; ?> <span>
-            (<?php echo '$' . $fetch_cart['price'] . '/-' . ' x ' . $fetch_cart['quantity']; ?>)</span></p>
+    <p> <?php echo $fetch_cart['name']; ?> <span>
+        (<?php echo '$' . $fetch_cart['price'] . '/-' . ' x ' . $fetch_cart['quantity']; ?>)</span></p>
 
     <?php
       }
@@ -109,53 +109,53 @@ if (isset($_POST['order_btn'])) {
       <div class="flex">
 
         <div class="inputBox">
-          <span>your name :</span>
+          <span>Your name :</span>
           <input type="text" name="name" required placeholder="enter your name">
         </div>
 
         <div class="inputBox">
-          <span>your number :</span>
+          <span>Your number :</span>
           <input type="number" name="number" required placeholder="enter your number">
         </div>
 
         <div class="inputBox">
-          <span>your email :</span>
+          <span>Your email :</span>
           <input type="email" name="email" required placeholder="enter your email">
         </div>
 
         <div class="inputBox">
-          <span>payment method :</span>
+          <span>Payment method :</span>
           <select name="method">
-            <option value="cash on delivery">cash on delivery</option>
-            <option value="credit card">credit card</option>
+            <option value="online">Online</option>
+            <option value="COD">COD</option>
             <option value="paypal">paypal</option>
-            <option value="paytm">paytm</option>
+
           </select>
         </div>
 
         <div class="inputBox">
-          <span>address line 01 :</span>
-          <input type="number" min="0" name="flat" required placeholder="e.g flat no.">
+          <span>Apartment / flat :</span>
+          <input type="number" min="0" name="flat" required placeholder="e.g 123">
         </div>
         <div class="inputBox">
-          <span>address line 01 :</span>
-          <input type="text" name="street" required placeholder="e.g street name">
+          <span>Street :</span>
+          <input type="text" name="street" required placeholder="e.g Quoc Lo 50">
         </div>
         <div class="inputBox">
-          <span>city :</span>
-          <input type="text" name="city" required placeholder="e.g mumbai">
+          <span>Village :</span>
+          <input type="text" name="village" required placeholder="e.g Thuan Thanh">
         </div>
         <div class="inputBox">
-          <span>state :</span>
-          <input type="text" name="state" required placeholder="e.g maharashtra">
+          <span>District :</span>
+          <input type="text" name="district" required placeholder="e.g Can Giuoc">
         </div>
         <div class="inputBox">
-          <span>country :</span>
-          <input type="text" name="country" required placeholder="e.g india">
+          <span>City :</span>
+          <input type="text" name="city" required placeholder="e.g HCM">
         </div>
         <div class="inputBox">
-          <span>pin code :</span>
-          <input type="number" min="0" name="pin_code" required placeholder="e.g 12345">
+          <span>Province :</span>
+          <input type="text" name="province" required placeholder="e.g Long An">
         </div>
       </div>
 
