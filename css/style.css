@@ -867,7 +867,14 @@ section {
 	background-color: var(--light-bg);
 	border-radius: 0.5rem;
 }
-
+.search-form .box-price {
+	gap: 1rem;
+	border: var(--border);
+	font-size: 2srem;
+	color: var(--black);
+	background-color: var(--light-bg);
+	border-radius: 0.5rem;
+}
 .footer {
 	background-color: var(--light-bg);
 }
