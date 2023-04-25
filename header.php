@@ -42,6 +42,9 @@ if (isset($message)) {
         <div class="fas fa-bars" id="menu-btn"></div>
         <a href="search_page.php" class="fas fa-search"></a>
         <div id="user-btn" class="fas fa-user"></div>
+        <a href="History.php" class="fas fa-history" name="history" type="submit"></a>
+
+
 
         <?php
         $select_cart_number = mysqli_query($conn, "SELECT * FROM `cart`
@@ -52,6 +55,7 @@ if (isset($message)) {
         <a href="cart.php"><i class="fas fa-shopping-cart"></i><span>
             (<?php echo  $cart_rows_number ?></span>)</a>
       </div>
+
 
       <div class="user-box">
         <p>username : <span><?php echo $_SESSION['user_name']; ?></span></p>

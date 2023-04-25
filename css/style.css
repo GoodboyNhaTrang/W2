@@ -1281,3 +1281,70 @@ li {
 		font-size: 3rem;
 	}
 }
+
+
+.order-history {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.order-history th, .order-history td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.order-history th {
+    text-align: left;
+    background-color: #f2f2f2;
+}
+
+.order-history tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.order-history tr:hover {
+    background-color: #ddd;
+}
+
+.order-history .order-id {
+    font-weight: bold;
+}
+
+.order-history .order-price {
+    text-align: right;
+}
+
+.prder-history .order-name {
+	color: red;
+}
+
+table {
+    font-family: Arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+  }
+  
+  th {
+    background-color: #dddddd;
+  }
+  
+  /* Kiểu CSS cho các liên kết xem chi tiết đơn hàng */
+  a.view-order {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  a.view-order:hover {
+    text-decoration: underline;
+  }
+  
+  /* Kiểu CSS cho phần tử giá tiền */
+  span.price {
+    font-weight: bold;
+  }
