@@ -46,61 +46,63 @@ if (isset($_POST['add_to_cart'])) {
     <h3>search page</h3>
     <p><a href="home.php">order</a>/ search</p>
   </div>
-
+  <!-- search  -->
   <section class="search-form">
-    <form action="" method="post">
-      <input type="text" name="search" placeholder="search products..." class="box">
-      <input type="number" name="min_price" placeholder="min price" class="box-price"><br>
-      <input type="number" name="max_price" placeholder="max price" class="box-price"><br>
+    <form action="" method="post" name="frm" id="frm">
+      <input type="text" name="search" placeholder="search products..." class="box" value="<?php if(isset($_POST['search'])) echo $_POST['search']?>">
+      <select id="categories" name="categories" class="box-price">
+        <option value="-1">Category</option>
+        <!-- categories -->
+        <?php
+        $categories = mysqli_query($conn, "SELECT * FROM `categorys`");
+        if (mysqli_num_rows($categories) > 0) {
+          $s = "";
+          while ($fetch_categories = mysqli_fetch_assoc($categories)) {
+            if(isset($_POST['categories']) && $_POST['categories'] == $fetch_categories['id'])
+              $s .= sprintf('<option value="%s" selected>%s</option>, ', $fetch_categories['id'], $fetch_categories['category_name']);
+            $s .= sprintf('<option value="%s">%s</option>, ', $fetch_categories['id'], $fetch_categories['category_name']);
+          }
+          echo $s;
+        }
+        ?>
+      </select>
+      <input type="number" name="min_price" placeholder="min price" class="box-price" value="<?php if(isset($_POST['min_price'])) echo $_POST['min_price']?>"><br>
+      <input type="number" name="max_price" placeholder="max price" class="box-price" value="<?php if(isset($_POST['max_price'])) echo $_POST['max_price']?>"><br>
       <input type="submit" name="submit" value="search" class="btn">
     </form>
-
-
   </section>
 
   <section class="products" style="padding-top: 0;">
     <div class="box-container">
       <?php
+        if(isset($_GET['page'])){
+          var_dump($_GET['page']);
+          ?>
+
+        <?php
+        }
+      $number_of_pages = 0;
       if (isset($_POST['submit'])) {
-        if (empty($_POST['min_price']) && empty($_POST['max_price'])) {
-          $search_item = $_POST['search'];
-          $select_products = mysqli_query($conn, "SELECT * FROM `products`
-        WHERE name LIKE '%{$search_item}%'")
-            or die('query failed');
-          if (mysqli_num_rows($select_products) > 0) {
-            while ($fetch_products = mysqli_fetch_assoc($select_products)) {
-
-
-      ?>
-              <form action="" method="post" class="box">
-                <img class="image" src="uploaded_img/<?php echo $fetch_products['image']; ?>" alt="">
-                <div class="name"><?php echo $fetch_products['name']; ?></div>
-                <div class="price">$<?php echo $fetch_products['price']; ?>/-</div>
-                <input type="number" min="1" name="product_quantity" value="1" class="qty">
-                <input type="hidden" name="product_name" value="<?php echo $fetch_products['name']; ?>">
-                <input type="hidden" name="product_price" value="<?php echo $fetch_products['price']; ?>">
-                <input type="hidden" name="product_image" value="<?php echo $fetch_products['image']; ?>">
-                <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
-                <input type="submit" value="add to cart" name="add_to_cart" class="btn">
-              </form>
-            <?php
-            }
+        // LIMIT $results_per_page OFFSET  $this_page_first_result
+        if ($_POST['categories'] != -1) {
+          $sql = "SELECT p.* FROM `products` as p, `categorys` as c
+          WHERE p.name LIKE '%{$_POST['search']}%' AND p.category_id = c.id and c.id = {$_POST['categories']}";
+          if(!empty($_POST['min_price']) && !empty($_POST['max_price'])){
+            $min_price = $_POST['min_price'];
+            $max_price = $_POST['max_price'];
+            $sql .= " AND p.price BETWEEN $min_price AND $max_price";
+          }else{
           }
-        } else if (!empty($_POST['min_price']) && !empty($_POST['max_price'])) {
-
-          $min_price = $_POST['min_price'];
-          $max_price = $_POST['max_price'];
-          $search_item = "%" . $_POST['search'] . "%";
-          // // Tạo truy vấn SQL để tìm kiếm sản phẩm theo độ dài của khoảng giá
-          $sql = "SELECT * FROM `products` WHERE price BETWEEN ? AND ? and name like ? ";
-          $stmt = mysqli_prepare($conn, $sql);
-
-          mysqli_stmt_bind_param($stmt, "iis", $min_price, $max_price, $search_item);
-          mysqli_stmt_execute($stmt);
-          // $result = mysqli_query($conn, "SELECT * FROM `products` 
-          // WHERE price BETWEEN " . $min_price . " AND " . $max_price . " 
-          // AND name like '%" . $search_item . "%' ");
-          $result = mysqli_stmt_get_result($stmt);
+        } 
+        else {
+          $sql = "SELECT * FROM `products` WHERE name LIKE '%{$_POST['search']}%'";
+          if(!empty($_POST['min_price']) && !empty($_POST['max_price'])){
+            $min_price = $_POST['min_price'];
+            $max_price = $_POST['max_price'];
+            $sql .= " AND price BETWEEN $min_price AND $max_price";
+          }
+        }
+        $result = mysqli_query($conn, $sql);
           if (mysqli_num_rows($result) > 0) {
             while ($row = mysqli_fetch_assoc($result)) {
             ?>
@@ -112,53 +114,24 @@ if (isset($_POST['add_to_cart'])) {
                 <input type="hidden" name="product_name" value="<?php echo $row["name"]; ?>">
                 <input type="hidden" name="product_price" value="<?php echo $row["price"]; ?>">
                 <input type="hidden" name="product_image" value="<?php echo $row["image"]; ?>">
-
+                <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
                 <input type="submit" value="add to cart" name="add_to_cart" class="btn">
               </form>
-      <?php
+            <?php
             }
-          }
-        } else {
+          } else {
           echo '<p class="empty">no result found!</p>';
         }
       } else {
         echo '<p class="empty">search something!</p>';
       }
       ?>
-
     </div>
-
-
   </section>
-
-
-  <div class="category-container">
-    <div class="card">
-      <div class="title-menu">
-        <h3>Category</h3>
-      </div>
-      <div class="category-link">
-        <ul>
-          <?php
-          $select_categorys = mysqli_query($conn, "SELECT * FROM `categorys`") or die('query failed');
-          if (mysqli_num_rows($select_categorys) > 0) {
-            while ($fetch_categorys = mysqli_fetch_assoc($select_categorys)) {
-          ?>
-              <a href="shop.php?category=<?= $fetch_categorys['category_name'] ?>" value="<?php echo $fetch_categorys['id'] ?>">
-                <li><?php echo $fetch_categorys['category_name'] ?></li>
-              </a>
-          <?php
-            }
-          }
-          ?>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-
+  
   <?php
   include 'footer.php';
+
   ?>
   <script src="js/script.js"></script>
 </body>
