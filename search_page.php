@@ -8,6 +8,8 @@ if (!isset($user_id)) {
   header('location:login.php');
 }
 
+
+
 if (isset($_POST['add_to_cart'])) {
   $product_id = $_POST['product_id'];
   $product_quantity = $_POST['product_quantity'];
@@ -48,17 +50,17 @@ if (isset($_POST['add_to_cart'])) {
   </div>
   <!-- search  -->
   <section class="search-form">
-    <form action="" method="post" name="frm" id="frm">
-      <input type="text" name="search" placeholder="search products..." class="box" value="<?php if(isset($_POST['search'])) echo $_POST['search']?>">
-      <select id="categories" name="categories" class="box-price">
-        <option value="-1">Category</option>
+    <form action="" method="get">
+      <input type="text" name="search" placeholder="search products..." class="box" value="<?php if (isset($_GET['search'])) echo $_GET['search'] ?>">
+      <select id="category" name="category" class="box-price">
+        <option value="">Category</option>
         <!-- categories -->
         <?php
         $categories = mysqli_query($conn, "SELECT * FROM `categorys`");
         if (mysqli_num_rows($categories) > 0) {
           $s = "";
           while ($fetch_categories = mysqli_fetch_assoc($categories)) {
-            if(isset($_POST['categories']) && $_POST['categories'] == $fetch_categories['id'])
+            if (!empty($_GET['category']) && $_GET['category'] == $fetch_categories['id'])
               $s .= sprintf('<option value="%s" selected>%s</option>, ', $fetch_categories['id'], $fetch_categories['category_name']);
             $s .= sprintf('<option value="%s">%s</option>, ', $fetch_categories['id'], $fetch_categories['category_name']);
           }
@@ -66,60 +68,70 @@ if (isset($_POST['add_to_cart'])) {
         }
         ?>
       </select>
-      <input type="number" name="min_price" placeholder="min price" class="box-price" value="<?php if(isset($_POST['min_price'])) echo $_POST['min_price']?>"><br>
-      <input type="number" name="max_price" placeholder="max price" class="box-price" value="<?php if(isset($_POST['max_price'])) echo $_POST['max_price']?>"><br>
+      <input type="number" name="minPrice" placeholder="min price" class="box-price" value="<?php if (isset($_GET['minPrice'])) echo $_GET['minPrice'] ?>"><br>
+      <input type="number" name="maxPrice" placeholder="max price" class="box-price" value="<?php if (isset($_GET['maxPrice'])) echo $_GET['maxPrice'] ?>"><br>
       <input type="submit" name="submit" value="search" class="btn">
     </form>
   </section>
 
   <section class="products" style="padding-top: 0;">
-    <div class="box-container">
+    <div class="box-container" id="product-container">
       <?php
-        if(isset($_GET['page'])){
-          var_dump($_GET['page']);
-          ?>
-
-        <?php
-        }
-      $number_of_pages = 0;
-      if (isset($_POST['submit'])) {
+      if (isset($_GET['submit']) || isset($_GET['page'])) {
+        $results_per_page = 6;
+        $number_of_results = 0;
+        $number_of_pages = 0;
+        if (isset($_GET['search']))
+          $searchItem = $_GET['search'];
+        else
+          $searchItem = "";
         // LIMIT $results_per_page OFFSET  $this_page_first_result
-        if ($_POST['categories'] != -1) {
+        if (!empty($_GET['category'])) {
           $sql = "SELECT p.* FROM `products` as p, `categorys` as c
-          WHERE p.name LIKE '%{$_POST['search']}%' AND p.category_id = c.id and c.id = {$_POST['categories']}";
-          if(!empty($_POST['min_price']) && !empty($_POST['max_price'])){
-            $min_price = $_POST['min_price'];
-            $max_price = $_POST['max_price'];
-            $sql .= " AND p.price BETWEEN $min_price AND $max_price";
-          }else{
+          WHERE p.name LIKE '%$searchItem%' AND p.category_id = c.id and c.id = {$_GET['category']}";
+          if (!empty($_GET['minPrice']) && !empty($_GET['maxPrice'])) {
+            $minPrice = $_GET['minPrice'];
+            $maxPrice = $_GET['maxPrice'];
+            $sql .= " AND p.price BETWEEN $minPrice AND $maxPrice";
+          } else {
           }
-        } 
-        else {
-          $sql = "SELECT * FROM `products` WHERE name LIKE '%{$_POST['search']}%'";
-          if(!empty($_POST['min_price']) && !empty($_POST['max_price'])){
-            $min_price = $_POST['min_price'];
-            $max_price = $_POST['max_price'];
-            $sql .= " AND price BETWEEN $min_price AND $max_price";
+        } else {
+          $sql = "SELECT * FROM `products` WHERE name LIKE '%$searchItem%'";
+          if (!empty($_GET['minPrice']) && !empty($_GET['maxPrice'])) {
+            $minPrice = $_GET['minPrice'];
+            $maxPrice = $_GET['maxPrice'];
+            $sql .= " AND price BETWEEN $minPrice AND $maxPrice";
           }
         }
-        $result = mysqli_query($conn, $sql);
-          if (mysqli_num_rows($result) > 0) {
-            while ($row = mysqli_fetch_assoc($result)) {
-            ?>
-              <form action="" method="post" class="box">
-                <img class="image" src="uploaded_img/<?php echo $row['image']; ?>" alt="">
-                <div class="name"><?php echo $row["name"]; ?></div>
-                <div class="price">$<?php echo $row["price"]; ?>/-</div>
-                <input type="number" min="1" name="product_quantity" value="1" class="qty">
-                <input type="hidden" name="product_name" value="<?php echo $row["name"]; ?>">
-                <input type="hidden" name="product_price" value="<?php echo $row["price"]; ?>">
-                <input type="hidden" name="product_image" value="<?php echo $row["image"]; ?>">
-                <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
-                <input type="submit" value="add to cart" name="add_to_cart" class="btn">
-              </form>
-            <?php
-            }
-          } else {
+        $result = mysqli_query($conn, $sql) or die('query failed');
+
+        $number_of_results = mysqli_num_rows($result);
+        $number_of_pages = ceil($number_of_results / $results_per_page);
+        if (!isset($_GET['page'])) {
+          $page = 1;
+        } else {
+          $page = $_GET['page'];
+        }
+        $this_page_first_result = ($page - 1) * $results_per_page;
+        $sql .= " LIMIT $results_per_page OFFSET  $this_page_first_result ";
+        $result = mysqli_query($conn, $sql) or die('query failed');
+        if (mysqli_num_rows($result) > 0) {
+          while ($row = mysqli_fetch_assoc($result)) {
+      ?>
+            <form action="" method="get" class="box">
+              <img class="image" src="uploaded_img/<?php echo $row['image']; ?>" alt="">
+              <div class="name"><?php echo $row["name"]; ?></div>
+              <div class="price">$<?php echo $row["price"]; ?>/-</div>
+              <input type="number" min="1" name="product_quantity" value="1" class="qty">
+              <input type="hidden" name="product_name" value="<?php echo $row["name"]; ?>">
+              <input type="hidden" name="product_price" value="<?php echo $row["price"]; ?>">
+              <input type="hidden" name="product_image" value="<?php echo $row["image"]; ?>">
+              <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
+              <input type="submit" value="add to cart" name="add_to_cart" class="btn">
+            </form>
+      <?php
+          }
+        } else {
           echo '<p class="empty">no result found!</p>';
         }
       } else {
@@ -127,8 +139,48 @@ if (isset($_POST['add_to_cart'])) {
       }
       ?>
     </div>
+    <div class="pagination">
+      <?php
+      if (isset($_GET['submit']) || isset($_GET['page'])) {
+        echo '<a name="prev-btn" href="search_page.php?page=1">&laquo;</a>';
+        for ($page = 1; $page <= $number_of_pages; $page++) {
+          $active = ($page == 1) ? 'active' : '';
+          if (isset($_GET['page'])) {
+            if ($_GET['page'] == $page) {
+              $active = 'active';
+            } else {
+              $active = '';
+            }
+          }
+          $s = '<a class="' . $active . '"id="num_page" href="search_page.php?page=' . $page . '';
+          if (!empty($_GET['search'])) {
+            $s .= '&search=' . $_GET['search'] . '';
+          }
+          if (!empty($_GET['category'])){
+            $s .= '&category=' . $_GET['category'] . '';
+          }
+          if(!empty($_GET['minPrice']) && !empty($_GET['maxPrice'])){
+            $s .= '&minPrice=' . $_GET['minPrice'] . '&maxPrice='. $_GET['maxPrice'] .'';
+          }
+          echo $s . '">' . $page . '</a> ';
+        }
+        $s = '<a class="next-btn" href="shop.php?page=' . $number_of_pages . '';
+        if (!empty($_GET['search'])) {
+          $s .= '&search=' . $_GET['search'] . '';
+        }
+        if (!empty($_GET['category'])){
+          $s .= '&category=' . $_GET['category'] . '';
+        }
+        if(!empty($_GET['minPrice']) && !empty($_GET['maxPrice'])){
+          $s .= '&minPrice=' . $_GET['minPrice'] . '&maxPrice='. $_GET['maxPrice'] .'';
+        }
+        echo $s .'">&raquo;</a>';
+      }
+      ?>
+
+    </div>
   </section>
-  
+
   <?php
   include 'footer.php';
 
