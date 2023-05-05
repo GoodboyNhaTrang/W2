@@ -20,7 +20,6 @@ if (isset($_POST['add_to_cart'])) {
   if (mysqli_num_rows($check_cart_numbers) > 0) {
     $message[] = 'already added to cart';
   } else {
-    // var_dump($user_id);
     mysqli_query($conn, "INSERT INTO `cart`(user_id, product_id, quantity) 
     VALUES('$user_id', '$product_id','$product_quantity')")
       or die('query failed');
@@ -59,7 +58,7 @@ if (isset($_POST['add_to_cart'])) {
 
   <section class="products">
 
-    <h1 class="title">lastest products</h1>
+    <h1 class="title">latest products</h1>
 
     <div class="box-container">
 

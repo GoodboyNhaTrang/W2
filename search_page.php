@@ -13,7 +13,6 @@ if (!isset($user_id)) {
 if (isset($_POST['add_to_cart'])) {
   $product_id = $_POST['product_id'];
   $product_quantity = $_POST['product_quantity'];
-
   $check_cart_numbers = mysqli_query($conn, "SELECT * FROM `cart` 
   WHERE product_id = '$product_id' AND user_id = '$user_id'") or die('query failed');
 
@@ -93,7 +92,6 @@ if (isset($_POST['add_to_cart'])) {
             $minPrice = $_GET['minPrice'];
             $maxPrice = $_GET['maxPrice'];
             $sql .= " AND p.price BETWEEN $minPrice AND $maxPrice";
-          } else {
           }
         } else {
           $sql = "SELECT * FROM `products` WHERE name LIKE '%$searchItem%'";
@@ -118,7 +116,7 @@ if (isset($_POST['add_to_cart'])) {
         if (mysqli_num_rows($result) > 0) {
           while ($row = mysqli_fetch_assoc($result)) {
       ?>
-            <form action="" method="get" class="box">
+            <form action="" method="POST" class="box">
               <img class="image" src="uploaded_img/<?php echo $row['image']; ?>" alt="">
               <div class="name"><?php echo $row["name"]; ?></div>
               <div class="price">$<?php echo $row["price"]; ?>/-</div>
@@ -126,7 +124,7 @@ if (isset($_POST['add_to_cart'])) {
               <input type="hidden" name="product_name" value="<?php echo $row["name"]; ?>">
               <input type="hidden" name="product_price" value="<?php echo $row["price"]; ?>">
               <input type="hidden" name="product_image" value="<?php echo $row["image"]; ?>">
-              <input type="hidden" name="product_id" value="<?php echo $fetch_products['id']; ?>">
+              <input type="hidden" name="product_id" value="<?php echo $row['id']; ?>">
               <input type="submit" value="add to cart" name="add_to_cart" class="btn">
             </form>
       <?php
@@ -164,7 +162,7 @@ if (isset($_POST['add_to_cart'])) {
           }
           echo $s . '">' . $page . '</a> ';
         }
-        $s = '<a class="next-btn" href="shop.php?page=' . $number_of_pages . '';
+        $s = '<a class="next-btn" href="search_page.php?page=' . $number_of_pages . '';
         if (!empty($_GET['search'])) {
           $s .= '&search=' . $_GET['search'] . '';
         }

@@ -113,9 +113,13 @@ $this_page_first_result = ($page - 1) * $results_per_page;
       <?php
       if (isset($_GET['category'])) {
         $category = $_GET['category'];
-        $select_products = mysqli_query($conn, "SELECT * FROM `products`,`categorys` WHERE products.category_id = categorys.id AND categorys.category_name = '$category' LIMIT $results_per_page OFFSET  $this_page_first_result ")  or die('query failed');;
+        $select_products = mysqli_query($conn, "SELECT * FROM `products`,`categorys` 
+        WHERE products.category_id = categorys.id 
+        AND categorys.category_name = '$category' 
+        LIMIT $results_per_page OFFSET  $this_page_first_result ")  or die('query failed');;
       } else {
-        $select_products = mysqli_query($conn, "SELECT * FROM `products` LIMIT $results_per_page OFFSET  $this_page_first_result ")  or die('query failed');;
+        $select_products = mysqli_query($conn, "SELECT * FROM `products` 
+        LIMIT $results_per_page OFFSET  $this_page_first_result ")  or die('query failed');;
       }
 
       if (mysqli_num_rows($select_products) > 0) {

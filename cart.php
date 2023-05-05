@@ -13,7 +13,7 @@ if (isset($_POST['update_cart'])) {
   $cart_quantity = $_POST['cart_quantity'];
 
   mysqli_query($conn, "UPDATE `cart` SET quantity = '$cart_quantity'
-  WHERE id = '$cart_id'") or die('query failed');
+  WHERE product_id = '$cart_id'") or die('query failed');
 
   $message[] = 'cart quantity updated!';
 }
@@ -21,7 +21,7 @@ if (isset($_POST['update_cart'])) {
 if (isset($_GET['delete'])) {
   $delete_id = $_GET['delete'];
   mysqli_query($conn, "DELETE FROM `cart` 
-  WHERE id ='$delete_id'") or die('query failed');
+  WHERE product_id ='$delete_id'") or die('query failed');
   header('location:cart.php');
 }
 
@@ -74,7 +74,7 @@ if (isset($_GET['delete_all'])) {
             <div class="name"><?php echo $fetch_cart['name']; ?></div>
             <div class="price">$<?php echo $fetch_cart['price']; ?>/-</div>
             <form action="" method="post">
-              <input type="hidden" name="cart_id" value="<?php echo $fetch_cart['id']; ?>">
+              <input type="hidden" name="product_id" value="<?php echo $fetch_cart['product_id']; ?>">
               <input type="number" name="cart_quantity" min="1" value="<?php echo $fetch_cart['quantity']; ?>">
               <input type="submit" name="update_cart" value="update" class="option-btn">
             </form>
